@@ -25,7 +25,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $menu = Menu::with('category')->paginate(10);
+        $menu = Menu::with('category')->orderBy('created_at', 'desc')->paginate(10);
         $category = Category::all();
 
 
