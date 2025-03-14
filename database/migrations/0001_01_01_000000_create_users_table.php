@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique(); // User's email (unique)
             $table->timestamp('email_verified_at')->nullable(); // Email verification timestamp (optional)
             $table->string('password'); // Hashed password
-            $table->string('role')->default('Официант'); // User role (default is 'Официант')
+            $table->string('role')->default('waiter'); // User role (default is 'Waiter')
             $table->boolean('is_blocked')->default(false); // Indicates if the user is blocked
             $table->integer('login_attempts')->default(0); // Tracks invalid login attempts
             $table->dateTime('last_login')->nullable(); // Timestamp of the user's last successful login

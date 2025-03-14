@@ -4,20 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
     use AuthenticatesUsers;
 
     /**
@@ -26,6 +17,13 @@ class LoginController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
+
+    /**
+     * Maximum number of allowed login attempts before blocking the user.
+     *
+     * @var int
+     */
+    protected $maxAttempts = 3;
 
     /**
      * Create a new controller instance.
@@ -38,15 +36,72 @@ class LoginController extends Controller
         $this->middleware('auth')->only('logout');
     }
 
-    protected function authenticated($request, $user)
+    /**
+     * Attempt to log the user in. Prevent login if the user is blocked.
+     */
+    protected function attemptLogin(Request $request)
     {
-        // Check if the user is an admin
-        if ($user->is_admin) {
-            // Redirect to /admin
+        $user = $this->guard()->getLastAttempted();
+
+        // Check if the user is blocked
+        if ($user && $user->is_blocked) {
+            return false; // Prevent login for blocked users
+        }
+
+        return $this->guard()->attempt(
+            $this->credentials($request),
+            $request->filled('remember')
+        );
+    }
+
+    /**
+     * Handle a failed login attempt.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        $user = $this->guard()->getLastAttempted();
+
+        if ($user) {
+            // Increment login attempts
+            $user->incrementLoginAttempts();
+
+            // Block user if login attempts exceed the limit
+            if ($user->login_attempts >= $this->maxAttempts) {
+                $user->block(); // Call the `block()` method from the model
+                throw ValidationException::withMessages([
+                    $this->username() => [__('Your account has been blocked due to too many failed login attempts.')],
+                ]);
+            }
+        }
+
+        // If no user or login still fails, send default failed login response
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
+    }
+
+    /**
+     * Handle successful authentication.
+     *
+     * Reset login attempts after successful login.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        // Reset login attempts
+        $user->resetLoginAttempts();
+
+        // Additional redirects for roles (if needed)
+        if ($user->isAdmin()) {
             return redirect('/admin');
         }
 
-        // Default redirect to /home
         return redirect($this->redirectTo);
     }
 }

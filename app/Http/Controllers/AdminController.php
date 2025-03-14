@@ -19,7 +19,7 @@ class AdminController extends Controller
     {
         $bookings = Booking::with('car', 'user')->get();
 
-        return view('admin.bookings', compact('bookings'));
+        return view('admin.bookings', compact('menus'));
     }
 
     public function updateStatus(Request $request)
