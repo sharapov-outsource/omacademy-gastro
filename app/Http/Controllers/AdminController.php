@@ -10,16 +10,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Menu;
 use Illuminate\Http\Request;
-use App\Models\Booking;
 
 class AdminController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with('car', 'user')->get();
+        $menu = Menu::with('category')->paginate(10);
+        $category = Category::all();
 
-        return view('admin.bookings', compact('menus'));
+        return view('admin.menus', compact('menu', 'category'));
     }
 
     public function updateStatus(Request $request)
@@ -29,12 +31,12 @@ class AdminController extends Controller
             'statuses.*' => 'in:Новое,Подтверждено,Отменено',
         ]);
 
-        foreach ($validated['statuses'] as $bookingId => $status) {
-            $booking = Booking::findOrFail($bookingId);
+        foreach ($validated['statuses'] as $menuId => $status) {
+            $booking = Menu::findOrFail($menuId);
             $booking->status = $status;
             $booking->save();
         }
 
-        return redirect()->route('bookings.index')->with('status', 'Статусы успешно обновлены.');
+        return redirect()->route('menu.index')->with('status', 'Статусы успешно обновлены.');
     }
 }
