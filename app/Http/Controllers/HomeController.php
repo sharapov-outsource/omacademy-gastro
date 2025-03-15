@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Menu;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -27,9 +28,10 @@ class HomeController extends Controller
     {
         $menu = Menu::with('category')->orderBy('created_at', 'desc')->paginate(10);
         $category = Category::all();
+        $orders = Order::all();
 
 
-        return view('home', compact('menu', 'category'));
+        return view('home', compact('menu', 'category', 'orders'));
     }
 
     /**
@@ -49,7 +51,7 @@ class HomeController extends Controller
 
         Menu::create($validated);
 
-        return redirect()->route('home')->with('success', 'Новое блюдо добавлено в меню!');
+        return redirect()->route('admin.index')->with('success', 'Новое блюдо добавлено в меню!');
     }
 
     /**
@@ -72,7 +74,7 @@ class HomeController extends Controller
             $menu->update($dishData);
         }
 
-        return redirect()->route('home')->with('success', 'Меню успешно обновлено!');
+        return redirect()->route('admin.index')->with('success', 'Меню успешно обновлено!');
     }
 
     /**
@@ -86,6 +88,6 @@ class HomeController extends Controller
         $menu = Menu::findOrFail($id);
         $menu->delete();
 
-        return redirect()->route('home')->with('success', 'Блюдо успешно удалено из меню!');
+        return redirect()->route('admin.index')->with('success', 'Блюдо успешно удалено из меню!');
     }
 }

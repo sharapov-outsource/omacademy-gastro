@@ -16,7 +16,6 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Название</th>
                         <th>Описание</th>
                         <th>Цена</th>
@@ -27,7 +26,6 @@
                     <tbody>
                     @foreach($menu as $dish)
                         <tr>
-                            <td>{{ $dish->uuid }}</td>
                             <td><input type="text" name="dishes[{{ $dish->uuid }}][name]" value="{{ $dish->name }}" class="form-control"></td>
                             <td><textarea name="dishes[{{ $dish->uuid }}][description]" class="form-control">{{ $dish->description }}</textarea></td>
                             <td><input type="number" name="dishes[{{ $dish->uuid }}][price]" value="{{ $dish->price }}" class="form-control" step="0.01" min="0"></td>
@@ -80,7 +78,7 @@
                 <label for="category_id">Категория:</label>
                 <select name="category_id" id="category_id" class="form-control" required>
                     @foreach($category as $item)
-                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        <option value="{{ $item->uuid }}">{{ $item->name }}</option>
                     @endforeach
                 </select>
             </div>
