@@ -111,4 +111,90 @@
             }
         }
     </script>
+<div class="h-25">&nbsp;</div>
+    <div class="container">
+        <h1>Управление официантами</h1>
+
+        {{-- Check if there are any waiters --}}
+        @if($waiters->isEmpty())
+            <p>Список официантов пуст.</p>
+        @else
+            {{-- Form for updating waiter details --}}
+            <form method="POST" action="{{ route('waiters.update') }}">
+                @csrf
+                @method('PATCH')
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Имя</th>
+                        <th>Статус</th>
+                        <th>Действие</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($waiters as $waiter)
+                        <tr>
+                            <td><input type="text" name="waiters[{{ $waiter->id }}][name]" value="{{ $waiter->name }}" class="form-control"></td>
+                            <td>
+                                <select name="waiters[{{ $waiter->id }}][is_blocked]" class="form-control">
+                                    <option value="0" {{ !$waiter->is_blocked ? 'selected' : '' }}>Активен</option>
+                                    <option value="1" {{ $waiter->is_blocked ? 'selected' : '' }}>Заблокирован</option>
+                                </select>
+                            </td>
+                            <td>
+                                {{-- Button to delete a waiter --}}
+                                <button type="button" class="btn btn-danger" onclick="deleteWaiter('{{ route('waiters.destroy', $waiter->id) }}')">Удалить</button>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+
+                {{-- Submit button to save changes --}}
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </form>
+        @endif
+
+        {{-- Form for adding a new waiter --}}
+        <h2 class="mt-5">Добавить нового официанта</h2>
+        <form method="POST" action="{{ route('waiters.store') }}">
+            @csrf
+            <div class="form-group">
+                <label for="name">Имя:</label>
+                <input type="text" name="name" id="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" name="password" id="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-success mt-3">Добавить официанта</button>
+        </form>
+    </div>
+
+    {{-- JavaScript for handling the delete action --}}
+    <script>
+        function deleteWaiter(url) {
+            if (confirm('Вы уверены, что хотите удалить этого официанта?')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
+
+                const methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'DELETE';
+                form.appendChild(methodInput);
+
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = '{{ csrf_token() }}';
+                form.appendChild(csrfInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
 @endsection

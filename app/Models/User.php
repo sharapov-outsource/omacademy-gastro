@@ -16,12 +16,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',         // User's name
-        'username',     // Unique login/username
         'password',     // User's hashed password
-        'role',         // Role: "Администратор" or "Официант"
+        'role',         // User role: "Администратор" or "Официант"
         'is_blocked',   // Determines if the user is blocked
         'login_attempts', // Tracks invalid login attempts
-        'last_login',   // Timestamp of the user's last login
+        'last_login',   // Timestamp of the last login
     ];
 
     /**
@@ -31,7 +30,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',        // The password is hidden in serialized output
-        'remember_token',  // Hidden "remember me" token
     ];
 
     /**

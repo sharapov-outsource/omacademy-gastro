@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\WaiterController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -28,4 +29,9 @@ Route::middleware(['auth'])->group(function () {
 // Admin-only routes with middleware protection
 Route::middleware([\App\Http\Middleware\IsAdmin::class])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index'); // Admin dashboard
+    Route::get('/waiters', [WaiterController::class, 'index'])->name('waiters.index'); // List all waiters
+    Route::post('/waiters', [WaiterController::class, 'store'])->name('waiters.store'); // Add a new waiter
+    Route::patch('/waiters', [WaiterController::class, 'update'])->name('waiters.update'); // Update waiter info
+    Route::delete('/waiters/{id}', [WaiterController::class, 'destroy'])->name('waiters.destroy'); // Delete a waiter
+
 });

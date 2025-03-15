@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Menu;
+use App\Models\User;
 
 class AdminController extends Controller
 {
@@ -19,7 +20,8 @@ class AdminController extends Controller
     {
         $menu = Menu::with('category')->paginate(10);
         $category = Category::all();
+        $waiters = User::where('role', 'waiter')->get();
 
-        return view('admin.menus', compact('menu', 'category'));
+        return view('admin.index', compact('menu', 'category', 'waiters'));
     }
 }

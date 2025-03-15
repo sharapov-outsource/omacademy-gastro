@@ -36,6 +36,11 @@ class LoginController extends Controller
         $this->middleware('auth')->only('logout');
     }
 
+    public function username()
+    {
+        return 'name';
+    }
+
     /**
      * Attempt to log the user in. Prevent login if the user is blocked.
      */
@@ -53,6 +58,12 @@ class LoginController extends Controller
             $request->filled('remember')
         );
     }
+
+    protected function credentials(Request $request)
+    {
+        return $request->only($this->username(), 'password');
+    }
+
 
     /**
      * Handle a failed login attempt.
